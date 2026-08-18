@@ -704,6 +704,22 @@ async function main() {
     compactPersonalRecord,
   };
 
+  const MUTATING_COMMANDS = new Set([
+    "add-workout",
+    "copy-workout",
+    "move-workout",
+    "replace-workout",
+    "switch-workout",
+  ]);
+  if (MUTATING_COMMANDS.has(command) && !toBoolean(flags["dry-run"], false)) {
+    if (process.env.TRCLI_ALLOW_CALENDAR_WRITES !== "I_UNDERSTAND_THIS_MUTATES_TRAINERROAD") {
+      throw new Error(
+        "Calendar writes are blocked. Use --dry-run for a preview, or set " +
+          "TRCLI_ALLOW_CALENDAR_WRITES=I_UNDERSTAND_THIS_MUTATES_TRAINERROAD to proceed.",
+      );
+    }
+  }
+
   switch (command) {
     case "discover":
       await commandDiscover(flags, commandDeps);
